@@ -3,6 +3,7 @@ import pickle
 import pandas as pd
 import numpy as np
 import os
+from pathlib import Path
 from sklearn.preprocessing import LabelEncoder
 
 # Page configuration
@@ -15,16 +16,18 @@ st.markdown("Predict if an employee is likely to leave the company using Machine
 # Load the trained pipeline (preferred) or fall back to previous model+encoders
 @st.cache_resource
 def load_model():
-    pipeline_path = r"C:\Users\dell\OneDrive\Desktop\Practice\MAY TEKWORK\DAY-1\attrition_pipeline.pkl"
-    model_path = r"C:\Users\dell\OneDrive\Desktop\Practice\MAY TEKWORK\DAY-1\logistic_model.pkl"
-    encoders_path = r"C:\Users\dell\OneDrive\Desktop\Practice\MAY TEKWORK\DAY-1\label_encoders.pkl"
+    # use repo-relative paths so deployment environments can find the files
+    base = Path(__file__).resolve().parent
+    pipeline_path = base / 'attrition_pipeline.pkl'
+    model_path = base / 'logistic_model.pkl'
+    encoders_path = base / 'label_encoders.pkl'
 
-    if os.path.exists(pipeline_path):
+    if pipeline_path.exists():
         pipeline = pickle.load(open(pipeline_path, 'rb'))
         return pipeline, None
 
     # fallback (legacy)
-    if os.path.exists(model_path) and os.path.exists(encoders_path):
+    if model_path.exists() and encoders_path.exists():
         model = pickle.load(open(model_path, 'rb'))
         encoders = pickle.load(open(encoders_path, 'rb'))
         return model, encoders
